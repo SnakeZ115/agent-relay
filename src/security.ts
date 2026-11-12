@@ -140,10 +140,11 @@ export function atomicWriteRestricted(filePath: string, content: string): void {
   try {
     try {
       fs.renameSync(tmpPath, filePath);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as NodeJS.ErrnoException;
       if (
         process.platform === 'win32' &&
-        (err.code === 'EPERM' || err.code === 'EEXIST')
+        (error.code === 'EPERM' || error.code === 'EEXIST')
       ) {
         try {
           fs.unlinkSync(filePath);

@@ -275,7 +275,7 @@ export async function runSupervisedSession(options: WatcherOptions): Promise<num
         );
 
         // Terminate active child PTY process to cycle into the new profile
-        ptyProcess.kill();
+        ptyProcess?.kill();
       } catch (err) {
         process.stdout.write(
           `\n\r[agent-relay] Error during profile handoff: ${err instanceof Error ? err.message : String(err)}\n\r`
