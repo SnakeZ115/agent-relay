@@ -58,7 +58,8 @@ export function resolveHostId(input?: string, invokedBinName?: string): HostId {
   }
 
   if (invokedBinName) {
-    const bin = path.basename(invokedBinName).toLowerCase().replace(/\.(exe|cmd|bat|ps1|js)$/i, '');
+    const cleanBin = invokedBinName.replace(/\\/g, '/');
+    const bin = path.basename(cleanBin).toLowerCase().replace(/\.(exe|cmd|bat|ps1|js)$/i, '');
     if (bin === 'agy-switch' || bin === 'antigravity' || bin === 'agy') {
       return 'antigravity';
     }

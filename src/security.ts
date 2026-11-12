@@ -8,12 +8,18 @@ export function isCloudSyncedPath(
   targetPath: string,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
-  if (!targetPath) {
+  if (!targetPath || !targetPath.trim()) {
     return false;
   }
 
-  const resolved = path.resolve(targetPath);
-  const normalized = resolved.toLowerCase();
+  const normalizeForCheck = (p: string): string => {
+    const isWinDrive = /^[a-zA-Z]:[\\/]/.test(p);
+    const isPosixAbs = p.startsWith('/');
+    const resolved = isWinDrive || isPosixAbs ? p : path.resolve(p);
+    return resolved.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '');
+  };
+
+  const normalized = normalizeForCheck(targetPath);
 
   const oneDriveVars = [
     env.OneDrive,
@@ -22,13 +28,13 @@ export function isCloudSyncedPath(
   ].filter((v): v is string => typeof v === 'string' && v.trim().length > 0);
 
   for (const varPath of oneDriveVars) {
-    const normVar = path.resolve(varPath).toLowerCase();
-    if (normalized === normVar || normalized.startsWith(normVar + path.sep)) {
+    const normVar = normalizeForCheck(varPath);
+    if (normalized === normVar || normalized.startsWith(normVar + '/')) {
       return true;
     }
   }
 
-  if (/[\\/]onedrive([\\/]|$)/i.test(resolved)) {
+  if (/(^|\/)onedrive(\/|$)/i.test(normalized)) {
     return true;
   }
 
