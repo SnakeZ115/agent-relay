@@ -174,10 +174,10 @@ export async function runSupervisedSession(options: WatcherOptions): Promise<num
 
   let activeProfile: ProfileStatus;
   if (options.initialProfile) {
-    const matched = existingProfiles.find((p) => p.alias === options.initialProfile);
+    const matched = existingProfiles.find((p) => p.name === options.initialProfile);
     activeProfile = matched ?? existingProfiles[0];
   } else {
-    activeProfile = existingProfiles.find((p) => p.isActive) ?? existingProfiles[0];
+    activeProfile = existingProfiles.find((p) => p.isDefault) ?? existingProfiles[0];
   }
 
   const lineBuffer = new CircularLineBuffer();
@@ -257,7 +257,7 @@ export async function runSupervisedSession(options: WatcherOptions): Promise<num
           direction: 'from-profile',
         });
 
-        const nextProfile = await getNextProfile(options.host, activeProfile.alias, {
+        const nextProfile = await getNextProfile(options.host, activeProfile.name, {
           realHome: options.realHome,
         });
 
@@ -271,7 +271,7 @@ export async function runSupervisedSession(options: WatcherOptions): Promise<num
 
         activeProfile = nextProfile;
         process.stdout.write(
-          `\n\r[agent-relay] Rotating active profile to "${activeProfile.alias}" (${activeProfile.host}). Relaying session state...\n\r`
+          `\n\r[agent-relay] Rotating active profile to "${activeProfile.name}" (${activeProfile.host}). Relaying session state...\n\r`
         );
 
         // Terminate active child PTY process to cycle into the new profile
@@ -292,7 +292,7 @@ export async function runSupervisedSession(options: WatcherOptions): Promise<num
       });
 
       const childEnv = buildChildEnv(options.host, activeProfile.path, sessionId);
-      const command = adapter.resolveCommand();
+      const command = adapter.binaryName;
       const args = pendingIgnitionPrompt
         ? adapter.buildIgnitionArgs(pendingIgnitionPrompt, options.extraArgs)
         : (options.extraArgs ? [...options.extraArgs] : []);

@@ -132,7 +132,7 @@ export async function generateHandoff(options: HandoffOptions): Promise<HandoffR
   if (artifacts.length > 0) {
     for (const artifact of artifacts) {
       sections.push(
-        `### Artifact: ${artifact.path} (${artifact.kind})\n` +
+        `### Artifact: ${artifact.path} (${artifact.name})\n` +
           '```markdown\n' +
           redactSecrets(artifact.content.trim()) +
           '\n```'
@@ -188,10 +188,11 @@ export async function generateHandoff(options: HandoffOptions): Promise<HandoffR
 
   return {
     handoffPath,
+    sessionId: options.sessionId,
     ignitionPrompt,
     nonce,
+    content: wrapped,
     bytesWritten,
-    timestamp: new Date(),
   };
 }
 

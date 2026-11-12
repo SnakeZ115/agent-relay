@@ -56,7 +56,7 @@ export interface ProfileStatus {
 
 export interface HandoffOptions {
   host: HostId;
-  profileName: string;
+  profileName?: string;
   profileDir: string;
   sessionId: string;
   cwd: string;
@@ -71,4 +71,5 @@ export interface HandoffResult {
   nonce: string;
   content: string;
   ignitionPrompt: string;
+  bytesWritten: number;
 }

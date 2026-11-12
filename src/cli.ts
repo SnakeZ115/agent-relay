@@ -209,9 +209,9 @@ export async function runCli(argv: string[], env: NodeJS.ProcessEnv = process.en
           continue;
         }
         for (const prof of list) {
-          const activeMarker = prof.isActive ? '* ' : '  ';
-          const authMarker = prof.authConfigExists ? '[auth: ok]' : '[auth: missing]';
-          console.log(`${activeMarker}${prof.alias.padEnd(16)} ${authMarker.padEnd(16)} ${prof.path}`);
+          const activeMarker = prof.isDefault ? '* ' : '  ';
+          const authMarker = prof.authenticated ? '[auth: ok]' : '[auth: missing]';
+          console.log(`${activeMarker}${prof.name.padEnd(16)} ${authMarker.padEnd(16)} ${prof.path}`);
         }
       }
       return 0;
