@@ -2,13 +2,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { HostId, PlanArtifact } from '../types.js';
 
-export function isBinaryInPath(
+export function resolveBinaryPath(
   binaryName: string,
   env: NodeJS.ProcessEnv = process.env,
-): boolean {
+): string {
+  if (path.isAbsolute(binaryName)) {
+    try {
+      if (fs.existsSync(binaryName) && fs.statSync(binaryName).isFile()) {
+        return binaryName;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   const pathEnv = env.PATH || env.Path || env.path || '';
   if (!pathEnv) {
-    return false;
+    return binaryName;
   }
 
   const entries = pathEnv.split(path.delimiter).filter(Boolean);
@@ -30,7 +40,7 @@ export function isBinaryInPath(
         if (fs.existsSync(candidate)) {
           const stat = fs.statSync(candidate);
           if (stat.isFile()) {
-            return true;
+            return candidate;
           }
         }
       } catch {
@@ -39,7 +49,15 @@ export function isBinaryInPath(
     }
   }
 
-  return false;
+  return binaryName;
+}
+
+export function isBinaryInPath(
+  binaryName: string,
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  const resolved = resolveBinaryPath(binaryName, env);
+  return resolved !== binaryName || (fs.existsSync(resolved) && fs.statSync(resolved).isFile());
 }
 
 export function buildBaseProfileEnv(

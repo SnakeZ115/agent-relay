@@ -1,6 +1,7 @@
 import * as path from 'node:path';
 import type { HostAdapter, HostId, ProfileStatus } from './types.js';
 import { getAdapter } from './adapters/index.js';
+import { resolveBinaryPath } from './adapters/common.js';
 import {
   getNextProfile,
   getRuntimeSessionDir,
@@ -292,10 +293,16 @@ export async function runSupervisedSession(options: WatcherOptions): Promise<num
       });
 
       const childEnv = buildChildEnv(options.host, activeProfile.path, sessionId);
-      const command = adapter.binaryName;
-      const args = pendingIgnitionPrompt
+      const rawCommand = resolveBinaryPath(adapter.binaryName, childEnv);
+      let command = rawCommand;
+      let args = pendingIgnitionPrompt
         ? adapter.buildIgnitionArgs(pendingIgnitionPrompt, options.extraArgs)
         : (options.extraArgs ? [...options.extraArgs] : []);
+
+      if (process.platform === 'win32' && /\.(cmd|bat)$/i.test(rawCommand)) {
+        command = process.env.COMSPEC || 'cmd.exe';
+        args = ['/c', rawCommand, ...args];
+      }
 
       pendingIgnitionPrompt = null;
       swapRequested = false;

@@ -8,6 +8,10 @@ import {
   getAllAdapters,
   getAdapter,
 } from '../src/adapters/index.js';
+import {
+  resolveBinaryPath,
+  isBinaryInPath,
+} from '../src/adapters/common.js';
 import type { HostId } from '../src/types.js';
 
 describe('adapters', () => {
@@ -303,6 +307,39 @@ describe('adapters', () => {
       assert.equal(artifacts.length, 1);
       assert.equal(artifacts[0].name, 'plan.md');
       assert.equal(artifacts[0].content, '# OpenCode Plan');
+    });
+  });
+
+  describe('resolveBinaryPath & isBinaryInPath', () => {
+    it('resolves binary with extension from custom PATH directory', () => {
+      const binDir = path.join(tempDir, 'bin');
+      fs.mkdirSync(binDir, { recursive: true });
+      const ext = process.platform === 'win32' ? '.exe' : '';
+      const execPath = path.join(binDir, `mock-tool${ext}`);
+      fs.writeFileSync(execPath, '#!/bin/sh\necho mock');
+
+      const customEnv = {
+        PATH: binDir,
+        PATHEXT: '.EXE;.CMD;.BAT',
+      };
+
+      const resolved = resolveBinaryPath('mock-tool', customEnv);
+      assert.equal(resolved, execPath);
+      assert.equal(isBinaryInPath('mock-tool', customEnv), true);
+    });
+
+    it('returns original binary name when not found in PATH', () => {
+      const customEnv = {
+        PATH: path.join(tempDir, 'empty'),
+      };
+      assert.equal(resolveBinaryPath('non-existent-binary-12345', customEnv), 'non-existent-binary-12345');
+      assert.equal(isBinaryInPath('non-existent-binary-12345', customEnv), false);
+    });
+
+    it('preserves existing absolute path', () => {
+      const filePath = path.join(tempDir, 'tool.exe');
+      fs.writeFileSync(filePath, '');
+      assert.equal(resolveBinaryPath(filePath), filePath);
     });
   });
 });
