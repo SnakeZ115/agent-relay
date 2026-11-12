@@ -1,0 +1,40 @@
+{
+  "name": "@snakez115/agent-relay",
+  "version": "0.1.0",
+  "description": "Multi-host session relay and account switcher for Antigravity CLI, Claude Code, Codex, and OpenCode with automatic PTY supervision and context handoff.",
+  "license": "MIT",
+  "author": "SnakeZ115",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "agent-relay": "./dist/cli.js",
+    "agy-switch": "./dist/cli.js",
+    "claude-switch": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "src/skills",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test \"test/**/*.spec.ts\"",
+    "postinstall": "node ./dist/cli.js install-skill --silent || exit 0",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
