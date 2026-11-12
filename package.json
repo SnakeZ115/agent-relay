@@ -4,6 +4,14 @@
   "description": "Multi-host session relay and account switcher for Antigravity CLI, Claude Code, Codex, and OpenCode with automatic PTY supervision and context handoff.",
   "license": "MIT",
   "author": "SnakeZ115",
+  "homepage": "https://github.com/SnakeZ115/agent-relay#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SnakeZ115/agent-relay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SnakeZ115/agent-relay/issues"
+  },
   "type": "module",
   "engines": {
     "node": ">=20"
